@@ -2,6 +2,7 @@ def COLOR_MAP = [
     'SUCCESS': 'good', 
     'FAILURE': 'danger',
 ]
+
 pipeline {
     agent any
     
@@ -95,6 +96,7 @@ pipeline {
             }
         }
 
+        // Stage 6: Upload Artifact
         stage("UploadArtifact"){
             steps{
                 nexusArtifactUploader(
@@ -114,6 +116,8 @@ pipeline {
                 )
             }
         }
+
+        // Stage 7: Build App Image
         stage('Build App Image') {
             steps {
                 script {
@@ -122,6 +126,7 @@ pipeline {
             }
         }
         
+        // Stage 8: Upload App Image
         stage('Upload App Image') {
           steps{
             script {
@@ -132,21 +137,22 @@ pipeline {
             }
           }
         }
+
+        // Stage 9: Deploy to ECS staging in AWS
         stage('Deploy to ECS staging in AWS') {
             steps {
                 withAWS(credentials: 'awscreds' region: 'us-east-2') {
                 sh 'aws ecs update-service --cluster ${cluster} --service ${service} --force-new-deployment'
-            }
-            }
+              }
+          }
         }
 
     }
+
+    // Post-build stage
     post {
         always {
             echo 'Slack Notifications.'
             slackSend channel: '#devopsci',
                 color: COLOR_MAP[currentBuild.currentResult],
-                message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \n More info at: ${env.BUILD_URL}"
-        }
-    }
-}
+                message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME}
