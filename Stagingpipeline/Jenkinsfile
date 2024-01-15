@@ -28,8 +28,8 @@ pipeline {
         registryCredential = 'ecr:us-east-2:awscreds'
         appRegistry = '475778147521.dkr.ecr.us-east-2.amazonaws.com/vprofileappimg'
         vprofileRegistry = 'https://475778147521.dkr.ecr.us-east-2.amazonaws.com'
-        cluster = "vprostaging"
-        service = "vproappstagingsvc"
+        cluster = "vproappstaging"
+        service = "vproappstageservice"
     }
 
     // Define different stages of the pipeline
